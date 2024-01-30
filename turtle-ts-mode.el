@@ -1,6 +1,8 @@
 ;; https://www.masteringemacs.org/article/lets-write-a-treesitter-major-mode
 ; https://github.com/nvim-treesitter/nvim-treesitter/blob/master/queries/turtle/highlights.scm
 
+(defvar turtle-indent-offset 2)
+
 (defvar turtle-ts-font-lock-rules
     '(:language turtle
       :override t
@@ -71,7 +73,17 @@
       ))
 
 (defvar turtle-ts-indent-rules
-    '())
+  `((turtle
+     ((node-is "property_list") parent ,turtle-indent-offset)
+     ((parent-is ,(regexp-opt '("property_list" "object_list")))
+      first-sibling 0)
+     ((node-is "object_collection") standalone-parent ,turtle-indent-offset)
+     ((parent-is ,(regexp-opt '("collection")))
+      first-sibling 0)
+     (catch-all no-indent ,turtle-indent-offset)
+     )))
+
+
 
 ;;;###autoload
 (define-derived-mode turtle-ts-mode prog-mode "N3/Turtle mode"
