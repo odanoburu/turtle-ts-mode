@@ -1,7 +1,33 @@
-;; https://www.masteringemacs.org/article/lets-write-a-treesitter-major-mode
-; https://github.com/nvim-treesitter/nvim-treesitter/blob/master/queries/turtle/highlights.scm
+;;; turtle-ts-mode.el --- RDF Turtle ts mode -*- lexical-binding: t; -*-
 
-(defvar turtle-indent-offset 2)
+;; Copyright (C) 2024-…  Bruno Cuconato
+
+;; Author: Bruno Cuconato <bcclaro+emacs@gmail.com>
+;; Keywords: RDF Turtle ttl semanticweb
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;;
+
+;;; Code:
+
+(require 'treesit)
+
+(defvar turtle-indent-offset 2
+  "Indentation offset for `turtle-ts-mode'.")
 
 (defvar turtle-ts-font-lock-rules
     '(:language turtle
@@ -70,31 +96,25 @@
       :feature punctuation-brackets
       ([(blank_node_property_list :anchor "[" @font-lock-bracket-face "]" @font-lock-bracket-face :anchor)
        (collection :anchor "(" @font-lock-bracket-face ")" @font-lock-bracket-face :anchor)])
-      ))
+      )
+    "Font lock rules for RDF Turtle.")
 
 (defvar turtle-ts-indent-rules
   `((turtle
-     ((node-is "property_list") parent ,turtle-indent-offset)
-     ((parent-is ,(regexp-opt '("property_list" "object_list")))
-      first-sibling 0)
+     ((node-is "statement") column-0 0)
+     ((match "]" "blank_node_property_list") no-indent 0)
+     ((node-is ,(regexp-opt (list "object_list" "property_list"))) parent ,turtle-indent-offset)
+     ((parent-is ,(regexp-opt (list "property_list" "object_list")))
+      prev-sibling 0)
      ((node-is "object_collection") standalone-parent ,turtle-indent-offset)
-     ((parent-is ,(regexp-opt '("collection")))
-      first-sibling 0)
+     ((parent-is ,(regexp-opt (list "collection"))) prev-sibling 0)
+
      (catch-all no-indent ,turtle-indent-offset)
-     )))
-
-
-
-;;;###autoload
-(define-derived-mode turtle-ts-mode prog-mode "N3/Turtle mode"
-  "Major mode for Turtle RDF documents, using tree-sitter."
-  (when (treesit-ready-p 'turtle)
-    (treesit-parser-create 'turtle)
-    (turtle-ts-setup)))
-
+     ))
+  "Indent rules for RDF Turtle.")
 
 (defun turtle-ts-setup ()
-  "Setup treesit for turtle-ts-mode."
+  "Setup treesit for `turtle-ts-mode'."
 
   ;; font locking
   (setq-local font-lock-defaults nil)
@@ -117,3 +137,16 @@
 
 
   (treesit-major-mode-setup))
+
+;;;###autoload
+(define-derived-mode turtle-ts-mode prog-mode "Turtle[ts]"
+  "Major mode for RDF Turtle documents, using tree-sitter."
+  (when (treesit-ready-p 'turtle)
+    (treesit-parser-create 'turtle)
+    (turtle-ts-setup)))
+
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.ttl\\'" . turtle-ts-mode))
+
+(provide 'turtle-ts-mode)
+;;; turtle-ts-mode.el ends here

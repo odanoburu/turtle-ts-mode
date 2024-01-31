@@ -1,0 +1,31 @@
+# -*- mode:org -*-
+#+TITLE: RDF Turtle Tree-sitter mode for Emacs
+
+A simple tree-sitter major mode for HTML and Emacs >29.
+
+See this [[https://www.masteringemacs.org/article/how-to-get-started-tree-sitter][walkthrough]] for how to setup Emacs with tree-sitter. You will
+need the [[https://github.com/GordianDziwis/tree-sitter-turtle/][Tree-sitter grammar for RDF Turtle]]:
+
+#+begin_src elisp
+  (add-to-list 'treesit-language-source-alist '(turtle "https://github.com/GordianDziwis/tree-sitter-turtle"))
+#+end_src
+
+Then clone this repo somewhere in your Emacs load-path. I recommend
+creating a directory for your Emacs packages that are not managed by
+any package manager, and then adding all of its subdirectories to your
+load-path. Then all you have to do is git clone this package in this
+directory, and load it.
+#+begin_src elisp
+  (let ((default-directory "~/.config/emacs/my-pkgs/"))
+    (normal-top-level-add-subdirs-to-load-path))
+
+  (use-package turtle-ts-mode)
+#+end_src
+
+
+# Links
+# https://www.w3.org/TR/rdf12-turtle/
+# https://www.masteringemacs.org/article/lets-write-a-treesitter-major-mode
+# https://github.com/nvim-treesitter/nvim-treesitter/blob/master/queries/turtle/highlights.scm
+# https://archive.casouri.cc/note/2023/tree-sitter-starter-guide/
+# https://tree-sitter.github.io/tree-sitter/using-parsers#query-syntax
