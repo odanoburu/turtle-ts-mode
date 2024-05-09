@@ -1,7 +1,9 @@
 # -*- mode:org -*-
 #+TITLE: RDF Turtle Tree-sitter mode for Emacs
 
-A simple tree-sitter major mode for HTML and Emacs >29.
+A simple tree-sitter major mode for RDF Turtle supporting Emacs >29.
+
+* Manual installation
 
 See this [[https://www.masteringemacs.org/article/how-to-get-started-tree-sitter][walkthrough]] for how to setup Emacs with tree-sitter. You will
 need the [[https://github.com/GordianDziwis/tree-sitter-turtle/][Tree-sitter grammar for RDF Turtle]]:

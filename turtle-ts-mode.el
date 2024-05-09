@@ -1,9 +1,13 @@
-;;; turtle-ts-mode.el --- RDF Turtle ts mode -*- lexical-binding: t; -*-
+;;; turtle-ts-mode.el --- RDF Turtle tree-sitter mode -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024-…  Bruno Cuconato
+;; Copyright (C) 2024 Bruno Cuconato
 
 ;; Author: Bruno Cuconato <bcclaro+emacs@gmail.com>
+;; Maintainer: Bruno Cuconato <bcclaro+emacs@gmail.com>
 ;; Keywords: RDF Turtle ttl semanticweb
+;; Version: 0.1.0
+;; URL: https://github.com/odanoburu/turtle-ts-mode
+;; News: …
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,7 +24,8 @@
 
 ;;; Commentary:
 
-;;
+;; A tree-sitter major mode for RDF Turtle (see
+;; https://www.w3.org/TR/rdf12-turtle/).
 
 ;;; Code:
 
@@ -102,14 +107,26 @@
 (defvar turtle-ts-indent-rules
   `((turtle
      ((node-is "statement") column-0 0)
-     ((match "]" "blank_node_property_list") no-indent 0)
-     ((node-is ,(regexp-opt (list "object_list" "property_list"))) parent ,turtle-indent-offset)
+     ((match "]" "blank_node_property_list") parent-bol 0)
+     ;; incident:IncidentShape
+     ;;   sh:property [
+     ;;     sh:path incident:handler;
+     ;;   ] ,
+     ;;   [ # <----
+     ;;     sh:path incident:reporter;
+     ;;   ]
+     ((match "blank_node_property_list" "object_list" nil 1)
+      standalone-parent 0)
+     ((match "property_list" "blank_node_property_list" nil 1 1)
+      standalone-parent ,turtle-indent-offset)
+     ((node-is ,(regexp-opt (list "object_list" "property_list")))
+      parent ,turtle-indent-offset)
      ((parent-is ,(regexp-opt (list "property_list" "object_list")))
-      prev-sibling 0)
+      first-sibling 0)
      ((node-is "object_collection") standalone-parent ,turtle-indent-offset)
      ((parent-is ,(regexp-opt (list "collection"))) prev-sibling 0)
 
-     (catch-all no-indent ,turtle-indent-offset)
+     (catch-all parent 0)
      ))
   "Indent rules for RDF Turtle.")
 
